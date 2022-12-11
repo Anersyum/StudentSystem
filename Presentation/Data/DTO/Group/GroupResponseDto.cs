@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace StudentTestPontis.Data.DTO.Group;
+namespace Presentation.Data.DTO.Group;
 
 public sealed class GroupResponseDto
 {

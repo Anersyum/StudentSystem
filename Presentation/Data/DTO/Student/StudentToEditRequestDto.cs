@@ -1,9 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace StudentTestPontis.Data.DTO.Student;
+namespace Presentation.Data.DTO.Student;
 
-public sealed class StudentRequestDto
+public sealed class StudentToEditRequestDto
 {
+    [Required]
+    public int Id { get; set; }
     [Required, MaxLength(100)]
     public string FirstName { get; set; }
 
@@ -13,7 +15,7 @@ public sealed class StudentRequestDto
     [Required, MaxLength(30), EmailAddress]
     public string Email { get; set; }
 
-    [Required, Range(1, 5)]
+    [Required]
     public int AcademicPerformance { get; set; }
 
     [Required]

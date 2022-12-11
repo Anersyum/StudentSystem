@@ -2,7 +2,7 @@
 using Domain.Abstractions.Interfaces;
 using Domain.Domains;
 using Microsoft.AspNetCore.Mvc;
-using StudentTestPontis.Data.DTO.Student;
+using Presentation.Data.DTO.Student;
 
 namespace StudentTestPontis.Controllers;
 

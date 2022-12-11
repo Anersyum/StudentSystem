@@ -1,4 +1,4 @@
-﻿namespace StudentTestPontis.Data.DTO.Student;
+﻿namespace Presentation.Data.DTO.Student;
 
 public sealed class AssignGroupDto
 {

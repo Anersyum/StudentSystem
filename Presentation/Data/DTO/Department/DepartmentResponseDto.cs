@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace StudentTestPontis.Data.DTO.Department;
+namespace Presentation.Data.DTO.Department;
 
 public sealed class DepartmentResponseDto
 {

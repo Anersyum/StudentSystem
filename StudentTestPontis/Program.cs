@@ -3,6 +3,7 @@ using Infrastructure.DataAccess;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Presentation;
 
 /* 
  Todo:
@@ -25,7 +26,8 @@ builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(connectionString, b => b.MigrationsAssembly("StudentTestPontis"));
 });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddApplicationPart(PresentationAssembly.GetAssembly());
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -47,7 +49,9 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.UseExceptionHandler("/Error");
+string errorUrl = "/Error";
+app.UseExceptionHandler(errorUrl);
+
 app.MapControllers();
 
 app.Run();

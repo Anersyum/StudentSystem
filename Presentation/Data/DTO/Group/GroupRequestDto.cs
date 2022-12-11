@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace StudentTestPontis.Data.DTO.Group;
+namespace Presentation.Data.DTO.Group;
 
 public sealed class GroupRequestDto
 {

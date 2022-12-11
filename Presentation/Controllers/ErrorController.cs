@@ -20,6 +20,13 @@ public sealed class ErrorController : ControllerBase
             return BadRequest(exceptionMessage);
         }
 
-        return Problem("Something went wrong! Contact site administrator!");
+        ProblemDetails problem = new()
+        {
+            Title = "Error",
+            Detail = "Something went wrong! Contact site administrator!",
+            Status = 500
+        };
+
+        return StatusCode(500, problem);
     }
 }
