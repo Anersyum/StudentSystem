@@ -49,7 +49,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-string errorUrl = "/Error";
+string errorUrl = "/Error" ;
 app.UseExceptionHandler(errorUrl);
 
 app.MapControllers();
