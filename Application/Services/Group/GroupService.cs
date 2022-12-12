@@ -12,18 +12,18 @@ public sealed class GroupService : IGroupService
         _groupRepository = groupRepository;
     }
 
-    public async Task<bool> GroupIsInSameDepartment(int oldGroupId, int newGroupId)
+    public async Task<bool> GroupIsInSameDepartment(int oldGroupId, int newGroupId, CancellationToken token)
     {
-        var oldDepartmentId = (await _groupRepository.GetById(oldGroupId))?.DepartmentId;
-        var newDepartmentId = (await _groupRepository.GetById(newGroupId))?.DepartmentId;
+        var oldDepartmentId = (await _groupRepository.GetById(oldGroupId, token))?.DepartmentId;
+        var newDepartmentId = (await _groupRepository.GetById(newGroupId, token))?.DepartmentId;
 
         return oldDepartmentId == newDepartmentId;
     }
 
-    public async Task<bool> GroupHasStudents(int groupId)
+    public async Task<bool> GroupHasStudents(int groupId, CancellationToken token)
     {
-        var group = await _groupRepository.GetById(groupId);
-        var groups = await _groupRepository.GetAll();
+        var group = await _groupRepository.GetById(groupId, token);
+
         return group?.StudentCount > 0;
     }
 }

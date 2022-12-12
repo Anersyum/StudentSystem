@@ -18,9 +18,9 @@ public sealed class DepartmentController : ControllerBase
     }
 
     [HttpGet("getById")]
-    public async Task<IActionResult> GetByIdAction(int departmentId)
+    public async Task<IActionResult> GetByIdAction(int departmentId, CancellationToken token)
     {
-        var department = await _department.GetById(departmentId);
+        var department = await _department.GetById(departmentId, token);
 
         if (department is null)
             return NotFound($"Department with the Id of {departmentId} not found.");
@@ -33,9 +33,9 @@ public sealed class DepartmentController : ControllerBase
     }
 
     [HttpGet("getAll")]
-    public async Task<IActionResult> GetAllAction()
+    public async Task<IActionResult> GetAllAction(CancellationToken token)
     {
-        var departments = await _department.GetAll();
+        var departments = await _department.GetAll(token);
 
         var response = departments
             .Select(g =>

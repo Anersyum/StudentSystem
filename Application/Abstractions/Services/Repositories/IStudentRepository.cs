@@ -4,14 +4,14 @@ namespace Application.Abstractions.Services.Repositories;
 
 public interface IStudentRepository
 {
-    public Task<int> Create(Student student);
-    public Task<int> Update(Student student);
-    public Task<bool> Delete(Student student);
-    public Task<bool> DeleteById(int id);
-    public Task<Student?> GetById(int id);
-    public Task<List<Student>> GetByGroupId(int groupId);
-    public Task<List<Student>> GetByGroup(Domain.Domains.Group group);
-    public Task<List<Student>> GetByDepartmentId(int departmentId);
-    public Task<List<Student>> GetByDepartment(Department department);
-    public Task<List<Student>> GetAll();
+    public Task<int> Create(Student student, CancellationToken token);
+    public Task<int> Update(Student student, CancellationToken token);
+    public Task<bool> Delete(Student student, CancellationToken token);
+    public Task<bool> DeleteById(int id, CancellationToken token);
+    public Task<Student?> GetById(int id, CancellationToken token);
+    public Task<List<Student>> GetByGroupId(int groupId, CancellationToken token);
+    public Task<List<Student>> GetByGroup(Domain.Domains.Group group, CancellationToken token);
+    public Task<List<Student>> GetByDepartmentId(int departmentId, CancellationToken token);
+    public Task<List<Student>> GetByDepartment(Department department, CancellationToken token);
+    public Task<List<Student>> GetAll(CancellationToken token);
 }

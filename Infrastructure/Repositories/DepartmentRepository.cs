@@ -14,9 +14,9 @@ public sealed class DepartmentRepository : IDepartmentRepository
         _dataContext = dataContext;
     }
 
-    public async Task<List<Department>> GetAll()
+    public async Task<List<Department>> GetAll(CancellationToken token)
     {
-        var departments = await _dataContext.Departments.Include(d => d.GroupsWithAverages).ToListAsync();
+        var departments = await _dataContext.Departments.Include(d => d.GroupsWithAverages).ToListAsync(token);
 
         foreach (var department in departments)
         {
@@ -30,12 +30,12 @@ public sealed class DepartmentRepository : IDepartmentRepository
         return departments;
     }
 
-    public async Task<Department?> GetById(int id)
+    public async Task<Department?> GetById(int id, CancellationToken token)
     {
         var department = await _dataContext.Departments
             .Where(d => d.Id == id)
             .Include(d => d.GroupsWithAverages)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(token);
 
         if (department is not null)
         {

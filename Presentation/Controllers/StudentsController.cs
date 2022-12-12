@@ -19,13 +19,13 @@ public sealed class StudentsController : ControllerBase
     }
 
     [HttpPost("create")]
-    public async Task<IActionResult> CreateAction([FromBody] StudentRequestDto studentRequest)
+    public async Task<IActionResult> CreateAction([FromBody] StudentRequestDto studentRequest, CancellationToken token)
     {
         Student student = new();
 
         ObjectMapper.Map(studentRequest, student);
 
-        int id = await _studentRepository.Create(student);
+        int id = await _studentRepository.Create(student, token);
 
         if (id == -1)
             return BadRequest("Assigned group doesn't exits");
@@ -34,44 +34,47 @@ public sealed class StudentsController : ControllerBase
     }
 
     [HttpPost("edit")]
-    public async Task<IActionResult> EditAction([FromBody] StudentToEditRequestDto studentRequest)
+    public async Task<IActionResult> EditAction([FromBody] StudentToEditRequestDto studentRequest, CancellationToken token)
     {
-        var student = await _studentRepository.GetById(studentRequest.Id);
+        var student = await _studentRepository.GetById(studentRequest.Id, token);
 
         if (student is null)
             return NotFound($"Student with the ID {studentRequest.Id} not found");
 
         ObjectMapper.Map(studentRequest, student);
 
-        await _studentRepository.Update(student);
+        await _studentRepository.Update(student, token);
 
         return Ok(student);
     }
 
     [HttpPost("assignGroup")]
-    public async Task<IActionResult> AssignGroupAction([FromBody] AssignGroupDto request, [FromServices] IGroupService groupService)
+    public async Task<IActionResult> AssignGroupAction(
+        [FromBody] AssignGroupDto request, 
+        [FromServices] IGroupService groupService,
+        CancellationToken token)
     {
-        var student = await _studentRepository.GetById(request.StudentId);
+        var student = await _studentRepository.GetById(request.StudentId, token);
 
         if (student is null)
             return NotFound($"Student with the Id {request.StudentId} was not found");
 
-        bool groupIsInTheSameDepartment = await groupService.GroupIsInSameDepartment(student.GroupId, request.GroupId);
+        bool groupIsInTheSameDepartment = await groupService.GroupIsInSameDepartment(student.GroupId, request.GroupId, token);
 
         if (!groupIsInTheSameDepartment)
             return BadRequest("Group must be in the same department");
 
         student.GroupId = request.GroupId;
 
-        await _studentRepository.Update(student);
+        await _studentRepository.Update(student, token);
 
         return Ok();
     }
 
     [HttpDelete("delete/{studentId}")]
-    public async Task<IActionResult> DeleteAction(int studentId)
+    public async Task<IActionResult> DeleteAction(int studentId, CancellationToken token)
     {
-        bool deleted = await _studentRepository.DeleteById(studentId);
+        bool deleted = await _studentRepository.DeleteById(studentId, token);
 
         if (!deleted)
             return NotFound($"User with the id {studentId} not found.");
@@ -80,9 +83,9 @@ public sealed class StudentsController : ControllerBase
     }
 
     [HttpGet("getById")]
-    public async Task<IActionResult> GetByIdAction(int studentId)
+    public async Task<IActionResult> GetByIdAction(int studentId, CancellationToken token)
     {
-        var student = await _studentRepository.GetById(studentId);
+        var student = await _studentRepository.GetById(studentId, token);
 
         if (student is null)
             return NotFound($"User with the id {studentId} not found.");
@@ -95,9 +98,9 @@ public sealed class StudentsController : ControllerBase
     }
 
     [HttpGet("getByGroupId")]
-    public async Task<IActionResult> GetByGroupIdAction(int groupId)
+    public async Task<IActionResult> GetByGroupIdAction(int groupId, CancellationToken token)
     {
-        var students = await _studentRepository.GetByGroupId(groupId);
+        var students = await _studentRepository.GetByGroupId(groupId, token);
 
         List<StudentResponseDto> response = students.Select(s =>
         {
@@ -111,9 +114,9 @@ public sealed class StudentsController : ControllerBase
     }
 
     [HttpGet("getByDepartmentId")]
-    public async Task<IActionResult> GetByDepartmentIdAction(int departmentId)
+    public async Task<IActionResult> GetByDepartmentIdAction(int departmentId, CancellationToken token)
     {
-        var students = await _studentRepository.GetByDepartmentId(departmentId);
+        var students = await _studentRepository.GetByDepartmentId(departmentId, token);
 
         List<StudentResponseDto> response = students.Select(s =>
         {
@@ -127,9 +130,9 @@ public sealed class StudentsController : ControllerBase
     }
 
     [HttpGet("getAll")]
-    public async Task<IActionResult> GetAllAction()
+    public async Task<IActionResult> GetAllAction(CancellationToken token)
     {
-        var allStudents = await _studentRepository.GetAll();
+        var allStudents = await _studentRepository.GetAll(token);
 
         List<StudentResponseDto> response = allStudents.Select(s =>
         {
