@@ -1,14 +1,15 @@
-﻿using Application.Helpers;
-using Domain.Abstractions.Interfaces;
+﻿using Application.Abstractions.Services.Group;
+using Application.Abstractions.Services.Repositories;
+using Application.Helpers;
 using Domain.Domains;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Data.DTO.Student;
 
-namespace StudentTestPontis.Controllers;
+namespace Presentation.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class StudentsController : ControllerBase
+public sealed class StudentsController : ControllerBase
 {
     private readonly IStudentRepository _studentRepository;
 
@@ -26,6 +27,9 @@ public class StudentsController : ControllerBase
 
         int id = await _studentRepository.Create(student);
 
+        if (id == -1)
+            return BadRequest("Assigned group doesn't exits");
+
         return CreatedAtAction(nameof(CreateAction), id);
     }
 
@@ -40,17 +44,22 @@ public class StudentsController : ControllerBase
         ObjectMapper.Map(studentRequest, student);
 
         await _studentRepository.Update(student);
-        
+
         return Ok(student);
     }
 
     [HttpPost("assignGroup")]
-    public async Task<IActionResult> AssignGroupAction([FromBody] AssignGroupDto request)
+    public async Task<IActionResult> AssignGroupAction([FromBody] AssignGroupDto request, [FromServices] IGroupService groupService)
     {
         var student = await _studentRepository.GetById(request.StudentId);
 
         if (student is null)
             return NotFound($"Student with the Id {request.StudentId} was not found");
+
+        bool groupIsInTheSameDepartment = await groupService.GroupIsInSameDepartment(student.GroupId, request.GroupId);
+
+        if (!groupIsInTheSameDepartment)
+            return BadRequest("Group must be in the same department");
 
         student.GroupId = request.GroupId;
 
@@ -59,11 +68,11 @@ public class StudentsController : ControllerBase
         return Ok();
     }
 
-    [HttpDelete("delete")]
-    public async Task<IActionResult> DeleteAction([FromBody] int studentId)
+    [HttpDelete("delete/{studentId}")]
+    public async Task<IActionResult> DeleteAction(int studentId)
     {
         bool deleted = await _studentRepository.DeleteById(studentId);
-        
+
         if (!deleted)
             return NotFound($"User with the id {studentId} not found.");
 

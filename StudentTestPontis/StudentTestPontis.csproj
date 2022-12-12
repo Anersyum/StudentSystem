@@ -20,5 +20,18 @@
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
     <ProjectReference Include="..\Presentation\Presentation.csproj" />
   </ItemGroup>
+	
+    <ItemGroup>
+	    <InternalsVisibleTo Include="IntegrationTests" />
+    </ItemGroup>
+  
+	<ItemGroup>
+    <None Update="SqlScripts\GroupAveragesScript.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="SqlScripts\ValidateDepartmentGroups.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 
 </Project>

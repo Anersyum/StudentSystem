@@ -1,4 +1,4 @@
-﻿using Domain.Abstractions.Interfaces;
+﻿using Application.Abstractions.Services.Repositories;
 using Domain.Domains;
 using Infrastructure.DataAccess;
 using Microsoft.EntityFrameworkCore;
@@ -16,12 +16,15 @@ public sealed class DepartmentRepository : IDepartmentRepository
 
     public async Task<List<Department>> GetAll()
     {
-        var departments = await _dataContext.Departments.Include(d => d.Groups).ToListAsync();
+        var departments = await _dataContext.Departments.Include(d => d.GroupsWithAverages).ToListAsync();
 
         foreach (var department in departments)
         {
-            department.AcademicAverage = 
-                department.Groups is null ? 0 : department.Groups.Average(g => g.AcademicAverage);
+            bool hasNoGroups = department.GroupsWithAverages is null || department.GroupsWithAverages.Count == 0;
+            
+            department.AcademicAverage = Math.Round(
+                hasNoGroups ? 0 : department.GroupsWithAverages!.Average(g => g.AcademicAverage),
+                2);
         }
 
         return departments;
@@ -31,13 +34,16 @@ public sealed class DepartmentRepository : IDepartmentRepository
     {
         var department = await _dataContext.Departments
             .Where(d => d.Id == id)
-            .Include(d => d.Groups)
+            .Include(d => d.GroupsWithAverages)
             .FirstOrDefaultAsync();
 
         if (department is not null)
         {
-            department.AcademicAverage = 
-                department.Groups is null ? 0 : department.Groups.Average(g => g.AcademicAverage);
+            bool hasNoGroups = department.GroupsWithAverages is null || department.GroupsWithAverages.Count == 0;
+
+            department.AcademicAverage = Math.Round(
+                hasNoGroups ? 0 : department.GroupsWithAverages!.Average(g => g.AcademicAverage),
+                2);
         }
 
         return department;

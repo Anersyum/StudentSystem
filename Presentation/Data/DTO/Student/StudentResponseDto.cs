@@ -9,7 +9,7 @@ public sealed class StudentResponseDto
 
     public string Email { get; set; }
 
-    public int AcademicPerformance { get; set; }
+    public double AcademicPerformance { get; set; }
 
     public int GroupId { get; set; }
 }

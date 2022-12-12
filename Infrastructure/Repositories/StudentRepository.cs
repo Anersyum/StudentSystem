@@ -1,4 +1,4 @@
-﻿using Domain.Abstractions.Interfaces;
+﻿using Application.Abstractions.Services.Repositories;
 using Domain.Domains;
 using Infrastructure.DataAccess;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +16,9 @@ public sealed class StudentRepository : IStudentRepository
 
     public async Task<int> Create(Student student)
     {
+        if (_dataContext.Groups.Any(group => group.Id == student.GroupId))
+            return -1;
+
         var createdStudent = await _dataContext.Students.AddAsync(student);
         await _dataContext.SaveChangesAsync();
 

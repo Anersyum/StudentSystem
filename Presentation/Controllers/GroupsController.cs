@@ -1,10 +1,11 @@
-﻿using Application.Helpers;
-using Domain.Abstractions.Interfaces;
+﻿using Application.Abstractions.Services.Group;
+using Application.Abstractions.Services.Repositories;
+using Application.Helpers;
 using Domain.Domains;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Data.DTO.Group;
 
-namespace StudentTestPontis.Controllers;
+namespace Presentation.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -24,19 +25,23 @@ public sealed class GroupsController : ControllerBase
 
         ObjectMapper.Map(groupRequest, group);
 
-        await _groupRepository.Create(group);
+        int id = await _groupRepository.Create(group);
 
-        return CreatedAtAction(nameof(CreateAction), group.Id);
+        if (id == -1)
+            return BadRequest("Assigned department doesn't exist.");
+
+        return CreatedAtAction(nameof(CreateAction), id);
     }
 
     [HttpPut("edit")]
     public async Task<IActionResult> EditAction([FromBody] GroupEditRequestDto groupRequest)
     {
-        var group = await _groupRepository.GetById(groupRequest.Id);
+        var groupWithAverages = await _groupRepository.GetById(groupRequest.Id);
 
-        if (group is null)
+        if (groupWithAverages is null)
             return NotFound("Group not found.");
 
+        Group group = new();
         ObjectMapper.Map(groupRequest, group);
 
         await _groupRepository.Update(group);
@@ -44,9 +49,14 @@ public sealed class GroupsController : ControllerBase
         return Ok(group.Id);
     }
 
-    [HttpDelete("delete")]
-    public async Task<IActionResult> DeleteAction([FromBody] int groupId)
+    [HttpDelete("delete/{groupId}")]
+    public async Task<IActionResult> DeleteAction([FromServices] IGroupService groupService , int groupId)
     {
+        bool groupHasStudents = await groupService.GroupHasStudents(groupId);
+
+        if (groupHasStudents)
+            return BadRequest("This group contains students.");
+
         var deleted = await _groupRepository.Delete(groupId);
 
         if (!deleted)
@@ -79,7 +89,7 @@ public sealed class GroupsController : ControllerBase
             .Select(g =>
             {
                 GroupResponseDto groupDto = new();
-                ObjectMapper.Map<Group, GroupResponseDto>(g, groupDto);
+                ObjectMapper.Map(g, groupDto);
 
                 return groupDto;
             })

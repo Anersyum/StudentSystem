@@ -12,6 +12,5 @@ public sealed class Group : Entity
 
     [Required, MaxLength(100)]
     public string Name { get; set; }
-    public double AcademicAverage { get; set; }
     public List<Student> Students { get; set; } = new(); 
 }

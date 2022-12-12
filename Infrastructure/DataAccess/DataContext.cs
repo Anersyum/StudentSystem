@@ -1,14 +1,16 @@
-﻿using Domain.Domains;
+﻿using Application.Abstractions;
+using Domain.Domains;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
 namespace Infrastructure.DataAccess;
 
-public sealed class DataContext : DbContext
+public sealed class DataContext : DbContext, IDataContext
 {
     public DbSet<Student> Students { get; set; }
     public DbSet<Group> Groups { get; set; }
     public DbSet<Department> Departments { get; set; }
+    public DbSet<GroupWithAverages> GroupsWithAverages { get; set; }
 
     public DataContext(DbContextOptions options) : base(options) { }
 
@@ -22,33 +24,9 @@ public sealed class DataContext : DbContext
             .WithMany(g => g.Students)
             .OnDelete(DeleteBehavior.Restrict);
 
-        modelBuilder.Entity<Student>().ToTable(tb => tb.HasTrigger("UpdateAcademicAverage"));
-
-        var jsonFile = File.ReadAllText("Students.json");
-        List<Student> students = JsonSerializer.Deserialize<List<Student>>(jsonFile)!;
-
-        List<Group> groups = new()
-        {
-            new()
-            {
-                Id = 1,
-                Name = "TestA",
-                DepartmentId = 1
-            },
-            new()
-            {
-                Id = 2,
-                Name = "TestB",
-                DepartmentId = 2
-            }
-            ,
-            new()
-            {
-                Id = 3,
-                Name = "TestC",
-                DepartmentId = 1
-            }
-        };
+        modelBuilder.Entity<GroupWithAverages>()
+            .ToView("GroupsWithAverages")
+            .HasKey(g => g.Id);
 
         List<Department> departments = new()
         {
@@ -66,11 +44,5 @@ public sealed class DataContext : DbContext
 
         modelBuilder.Entity<Department>()
             .HasData(departments);
-
-        modelBuilder.Entity<Group>()
-            .HasData(groups);
-
-        modelBuilder.Entity<Student>()
-            .HasData(students);
     }
 }

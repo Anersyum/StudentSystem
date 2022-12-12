@@ -14,7 +14,7 @@ public sealed class StudentRequestDto
     public string Email { get; set; }
 
     [Required, Range(1, 5)]
-    public int AcademicPerformance { get; set; }
+    public double AcademicPerformance { get; set; }
 
     [Required]
     public int GroupId { get; set; }

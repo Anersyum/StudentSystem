@@ -1,4 +1,4 @@
-﻿using Domain.Abstractions.Interfaces;
+﻿using Application.Abstractions.Services.Repositories;
 using Domain.Domains;
 using Infrastructure.DataAccess;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +16,10 @@ public sealed class GroupRepository : IGroupRepository
 
     public async Task<int> Create(Group group)
     {
-        _dataContext.Groups.Add(group);
+        if (!_dataContext.Departments.Any(department => department.Id == group.DepartmentId))
+            return -1;
+
+        await _dataContext.Groups.AddAsync(group);
         await _dataContext.SaveChangesAsync();
 
         return group.Id;
@@ -47,14 +50,16 @@ public sealed class GroupRepository : IGroupRepository
         return true;
     }
 
-    public async Task<List<Group>> GetAll()
+    public async Task<List<GroupWithAverages>> GetAll()
     {
-        return await _dataContext.Groups.ToListAsync();
+        var groups =  await _dataContext.GroupsWithAverages.ToListAsync();
+
+        return groups;
     }
 
-    public async Task<Group?> GetById(int id)
+    public async Task<GroupWithAverages?> GetById(int id)
     {
-        return await _dataContext.Groups.FirstOrDefaultAsync(g => g.Id == id);
+        return await _dataContext.GroupsWithAverages.FirstOrDefaultAsync(g => g.Id == id);
     }
 
     public async Task<int> Update(Group group)

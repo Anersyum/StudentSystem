@@ -17,7 +17,4 @@ public sealed class StudentToEditRequestDto
 
     [Required]
     public int AcademicPerformance { get; set; }
-
-    [Required]
-    public int GroupId { get; set; }
 }

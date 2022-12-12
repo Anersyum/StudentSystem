@@ -10,7 +10,7 @@ public static class ObjectMapper
     public static void Map<From, To>(From fromObject, To toObject)
     {
         if (fromObject == null || toObject == null)
-            throw new System.Exception("Object cannot be null.");
+            throw new ArgumentNullException("Object cannot be null.");
 
         var toType = typeof(To);
         var fromType = typeof(From);
